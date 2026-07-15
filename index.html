@@ -48,6 +48,18 @@
     </div>
   </section>
 
+  <div class="alive-summary" id="alive-summary">
+    <div class="alive-item">
+      <div class="value" id="alive-conditions">--</div>
+      <div class="label">條件開啟</div>
+    </div>
+    <div class="alive-divider"></div>
+    <div class="alive-item">
+      <div class="value" id="alive-bets">--</div>
+      <div class="label">筆投注有效</div>
+    </div>
+  </div>
+
   <div class="warn-banner" id="warn-banner"></div>
 
   <section>
@@ -96,7 +108,7 @@
           <input type="checkbox" id="filter-alive" checked />
           <span class="toggle-track"><span class="toggle-thumb"></span></span>
         </span>
-        <span class="toggle-label">只顯示尚未淘汰的投注</span>
+        <span class="toggle-label">只顯示還有效的投注</span>
       </label>
       <input type="text" id="filter-name" class="filter-input" placeholder="🔍 搜尋姓名" />
       <select id="filter-team" class="filter-select">
