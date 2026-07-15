@@ -397,12 +397,17 @@
     const nameQuery = document.getElementById("filter-name").value.trim().toLowerCase();
     const teamId = document.getElementById("filter-team").value;
     const note = document.getElementById("filter-note").value;
+    const aliveOnly = document.getElementById("filter-alive").checked;
+    // Only enforced when config actually defines the alive list; otherwise
+    // there's no "eliminated" data to filter against, so show everything.
+    const aliveSet = Array.isArray(config.aliveOptions) ? new Set(config.aliveOptions) : null;
 
     const filtered = overviewBets
       .filter((b) =>
         (!nameQuery || b.name.toLowerCase().includes(nameQuery)) &&
         (!teamId || b.teamId === teamId) &&
-        (!note || (b.note || "").trim() === note)
+        (!note || (b.note || "").trim() === note) &&
+        (!aliveOnly || !aliveSet || aliveSet.has((b.note || "").trim()))
       )
       .sort((a, b) => b.amount - a.amount);
 
@@ -411,7 +416,7 @@
     document.getElementById("modal-sub").textContent =
       `${uniqueNames} 人・${filtered.length} 筆投注・總金額 ${fmtMoney(sum)}`;
 
-    renderBettorList(filtered, nameQuery || teamId || note ? "沒有符合條件的下注紀錄" : "目前還沒有人下注");
+    renderBettorList(filtered, nameQuery || teamId || note || aliveOnly ? "沒有符合條件的下注紀錄" : "目前還沒有人下注");
   }
 
   function openOverviewModal() {
@@ -428,6 +433,7 @@
     document.getElementById("filter-name").value = "";
     document.getElementById("filter-team").value = "";
     document.getElementById("filter-note").value = "";
+    document.getElementById("filter-alive").checked = true;
     document.getElementById("modal-filters").classList.add("show");
 
     applyOverviewFilters();
@@ -499,6 +505,7 @@
     document.getElementById("filter-name").addEventListener("input", applyOverviewFilters);
     document.getElementById("filter-team").addEventListener("change", applyOverviewFilters);
     document.getElementById("filter-note").addEventListener("change", applyOverviewFilters);
+    document.getElementById("filter-alive").addEventListener("change", applyOverviewFilters);
     document.getElementById("refresh-btn").addEventListener("click", loadBetsAndRender);
     document.querySelectorAll(".stats .stat-card").forEach((card) => {
       card.addEventListener("click", openOverviewModal);
