@@ -248,7 +248,6 @@
       return;
     }
     el.classList.add("show");
-    animateValue(document.getElementById("alive-conditions"), config.aliveOptions.length);
     animateValue(document.getElementById("alive-bets"), agg.aliveBetsCount);
   }
 
@@ -522,7 +521,7 @@
     document.getElementById("filter-note").addEventListener("change", applyOverviewFilters);
     document.getElementById("filter-alive").addEventListener("change", applyOverviewFilters);
     document.getElementById("refresh-btn").addEventListener("click", loadBetsAndRender);
-    document.querySelectorAll(".stats .stat-card").forEach((card) => {
+    document.querySelectorAll(".stats .stat-card, #alive-summary").forEach((card) => {
       card.addEventListener("click", openOverviewModal);
       card.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
