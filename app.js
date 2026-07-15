@@ -205,8 +205,10 @@
     const teams = config.teams.map((t) => ({ ...t, backers: [], total: 0 }));
     const unmatched = [];
     const participants = new Set();
+    const aliveSet = Array.isArray(config.aliveOptions) ? new Set(config.aliveOptions) : null;
     let totalAmount = 0;
     let totalBets = 0;
+    let aliveBetsCount = 0;
 
     bets.forEach((b) => {
       const amount = parseFloat((b.amount || "0").replace(/[^0-9.\-]/g, ""));
@@ -224,11 +226,12 @@
       participants.add(b.name.trim().toLowerCase());
       totalAmount += amount;
       totalBets += 1;
+      if (aliveSet && aliveSet.has((b.note || "").trim())) aliveBetsCount += 1;
     });
 
     teams.forEach((t) => t.backers.sort((a, b) => b.amount - a.amount));
 
-    return { teams, unmatched, participants: participants.size, totalAmount, totalBets };
+    return { teams, unmatched, participants: participants.size, totalAmount, totalBets, aliveBetsCount };
   }
 
   // ---------- Rendering: stats ----------
@@ -236,6 +239,17 @@
     animateValue(document.getElementById("stat-participants"), agg.participants);
     animateValue(document.getElementById("stat-bets"), agg.totalBets);
     animateValue(document.getElementById("stat-total"), agg.totalAmount, { prefix: config.currencyPrefix || "" });
+  }
+
+  function renderAliveSummary(agg) {
+    const el = document.getElementById("alive-summary");
+    if (!Array.isArray(config.aliveOptions)) {
+      el.classList.remove("show");
+      return;
+    }
+    el.classList.add("show");
+    animateValue(document.getElementById("alive-conditions"), config.aliveOptions.length);
+    animateValue(document.getElementById("alive-bets"), agg.aliveBetsCount);
   }
 
   function renderWarnings(agg) {
@@ -462,6 +476,7 @@
       lastAgg = agg;
 
       renderStats(agg);
+      renderAliveSummary(agg);
       renderWarnings(agg);
       updateChart(agg);
       renderLegend(agg);
