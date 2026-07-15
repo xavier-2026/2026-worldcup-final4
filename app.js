@@ -399,11 +399,16 @@
 
   function populateNoteFilterOptions() {
     const select = document.getElementById("filter-note");
-    const noteOptions = config.noteOptions || [];
+    const aliveOnly = document.getElementById("filter-alive").checked;
+    const source = aliveOnly && Array.isArray(config.aliveOptions) ? config.aliveOptions : config.noteOptions || [];
+    const previousValue = select.value;
+
     const options = ['<option value="">全部投注條件</option>'].concat(
-      noteOptions.map((n) => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`)
+      source.map((n) => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`)
     );
     select.innerHTML = options.join("");
+    // Keep the selection if it's still a valid option under the new list, otherwise reset.
+    select.value = source.includes(previousValue) ? previousValue : "";
   }
 
   function applyOverviewFilters() {
@@ -445,8 +450,8 @@
     document.getElementById("modal-name").textContent = "全部下注總覽";
     document.getElementById("filter-name").value = "";
     document.getElementById("filter-team").value = "";
-    document.getElementById("filter-note").value = "";
     document.getElementById("filter-alive").checked = true;
+    populateNoteFilterOptions();
     document.getElementById("modal-filters").classList.add("show");
 
     applyOverviewFilters();
@@ -519,7 +524,10 @@
     document.getElementById("filter-name").addEventListener("input", applyOverviewFilters);
     document.getElementById("filter-team").addEventListener("change", applyOverviewFilters);
     document.getElementById("filter-note").addEventListener("change", applyOverviewFilters);
-    document.getElementById("filter-alive").addEventListener("change", applyOverviewFilters);
+    document.getElementById("filter-alive").addEventListener("change", () => {
+      populateNoteFilterOptions();
+      applyOverviewFilters();
+    });
     document.getElementById("refresh-btn").addEventListener("click", loadBetsAndRender);
     document.querySelectorAll(".stats .stat-card, #alive-summary").forEach((card) => {
       card.addEventListener("click", openOverviewModal);
